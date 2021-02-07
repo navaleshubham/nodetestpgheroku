@@ -1,8 +1,8 @@
 import express, { Router } from 'express';
 import UserController from '../controllers/user';
 
-const router = Router();
-const users = new UserController();
+const router: Router = Router();
+const users: UserController = new UserController();
 
 router.get('/all', users.get);
 router.post('/new', users.post);
