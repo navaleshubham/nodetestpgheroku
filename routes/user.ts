@@ -4,9 +4,9 @@ import UserController from '../controllers/user';
 const router = Router();
 const users = new UserController();
 
-router.get('/users', users.get);
-router.post('/user',users.post);
-router.put('/user',users.update);
-router.delete('/user/:id',users.delete)
+router.get('/all', users.get);
+router.post('/new', users.post);
+router.put('/update', users.update);
+router.delete('/delete/:id', users.delete)
 
 export default router;
