@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import pool from '../db.js';
+import pool from '../db';
 import jwt from 'jsonwebtoken';
 class UserController {
     createToken(Data) {
@@ -50,6 +50,22 @@ class UserController {
             }
             catch (error) {
                 res.status(500).send(error);
+            }
+        });
+    }
+    login(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const client = yield pool.connect();
+                const sql = `SELECT password FROM employee WHERE email=${req.body.email}`;
+                const { rows } = yield client.query(sql);
+                const result = yield client.query(sql);
+                const users = rows;
+                client.release();
+                res.status(200).send(result);
+            }
+            catch (error) {
+                res.status(404).send(error);
             }
         });
     }

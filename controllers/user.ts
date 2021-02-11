@@ -50,7 +50,19 @@ class UserController {
             res.status(500).send(error);
         }
     }
-
+    public async login(req: { body: { email: String, password: String } }, res: express.Response) {
+        try {
+            const client = await pool.connect();
+            const sql = `SELECT password FROM employee WHERE email=${req.body.email}`;
+            const { rows } = await client.query(sql);
+            const result = await client.query(sql);
+            const users = rows;
+            client.release();
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(404).send(error);
+        }
+    }
     public async update(
         req: { body: { first_name: String; last_name: String; title: String; id: number } },
         res: express.Response

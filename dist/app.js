@@ -13,8 +13,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 //class and functions
-import Pool from './db.js';
-import userrouter from './routes/user.js';
+import Pool from './db';
+import userrouter from './routes/user';
 // initialize the express server
 const app = express();
 // database conection test
@@ -39,7 +39,7 @@ function creteorchecktable() {
             console.log(result);
         }
         catch (error) {
-
+            console.log('table already exists');
         }
     });
 }
