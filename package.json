@@ -9,7 +9,7 @@
     "start": "nodemon dist/app.js",
     "bs": "npm run build & tcs & nodemon dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prettier-format": "prettier --config .prettierrc '**.ts' --write"
+    "pf": "prettier --config .prettierrc '**.ts' --write"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +26,7 @@
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.9",
     "@types/express": "^4.17.11",
     "@types/jsonwebtoken": "^8.5.0",
