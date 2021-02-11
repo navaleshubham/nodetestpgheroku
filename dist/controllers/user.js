@@ -13,11 +13,11 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield pool.connect();
-                const sql = "SELECT * FROM employees";
+                const sql = 'SELECT * FROM employees';
                 const { rows } = yield client.query(sql);
                 const users = rows;
                 client.release();
-                res.send(users);
+                res.status(200).send(users);
             }
             catch (error) {
                 res.status(400).send(error);
@@ -31,10 +31,10 @@ class UserController {
                 const sql = `INSERT INTO employees (last_name, first_name, title) VALUES('${req.body.last_name}','${req.body.first_name}','${req.body.title}')`;
                 const { rowCount } = yield client.query(sql);
                 client.release();
-                res.send({ rowCount: rowCount, result: rowCount == 1 ? true : false });
+                res.status(200).send({ rowCount: rowCount, result: rowCount == 1 ? true : false });
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
             }
         });
     }
@@ -44,10 +44,11 @@ class UserController {
                 const client = yield pool.connect();
                 const sql = `UPDATE employees SET FIRST_NAME='${req.body.first_name}',LAST_NAME='${req.body.last_name}',TITLE='${req.body.title}' WHERE employee_id=${req.body.id}`;
                 const { rowCount } = yield client.query(sql);
-                res.send({ rowcount: rowCount, result: rowCount == 1 ? true : false });
+                client.release();
+                res.status(200).send({ rowcount: rowCount, result: rowCount == 1 ? true : false });
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
             }
         });
     }
@@ -57,6 +58,7 @@ class UserController {
                 const client = yield pool.connect();
                 const sql = `DELETE FROM employees WHERE employee_id=${req.params.id}`;
                 const { rowCount } = yield client.query(sql);
+                client.release();
                 res.send({ rowcount: rowCount, result: rowCount == 1 ? true : false });
             }
             catch (error) {

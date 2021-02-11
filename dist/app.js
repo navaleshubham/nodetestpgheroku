@@ -1,18 +1,23 @@
 //library
 import express from 'express';
 import bodyParser from 'body-parser';
-import cors from "cors";
+import cors from 'cors';
 //class and functions
 import Pool from './db.js';
-import userrouter from "./routes/user.js";
+import userrouter from './routes/user.js';
 // initialize the express server
 const app = express();
 // database conection test
-Pool.connect(function (err, client, done) {
+Pool.connect(function (err, _client, _done) {
     if (err)
         console.log(err);
     console.log('Connected');
 });
+function authentication(request, response, next) {
+    console.log(`${request.method} ${request.path}`);
+    next();
+}
+app.use(authentication);
 //configuration
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -24,8 +29,8 @@ app.use('/user', userrouter);
 // app.get('/', (req, res, next) => {
 //     res.send('Hello world')
 // })
-// Define the port to run the server. this could either be defined 
+// Define the port to run the server. this could either be defined
 app.listen(process.env.PORT || 4000, () => {
-    console.log("server started on port", process.env.PORT || 4000);
+    console.log('server started on port', process.env.PORT || 4000);
 });
 //# sourceMappingURL=app.js.map
