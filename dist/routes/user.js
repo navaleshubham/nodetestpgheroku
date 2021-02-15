@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import UserController from '../controllers/user';
+import UserController from '../controllers/user.js';
 const router = Router();
-const users = new UserController();
-router.get('/all', users.get);
-router.post('/new', users.post);
-router.put('/update', users.update);
-router.delete('/delete/:id', users.delete);
+const EMPLOYEE = new UserController();
+router.get('/all', EMPLOYEE.get);
+router.post('/new', EMPLOYEE.post);
+router.put('/update', EMPLOYEE.update);
+router.post('/login', EMPLOYEE.login);
+router.delete('/delete/:id', EMPLOYEE.delete);
 export default router;
 //# sourceMappingURL=user.js.map

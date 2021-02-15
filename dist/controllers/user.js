@@ -7,26 +7,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import pool from '../db';
+import pool from '../db.js';
 import jwt from 'jsonwebtoken';
+import bcryptjs from 'bcryptjs';
 class UserController {
-    createToken(Data) {
-        const expiresIn = 60 * 60; // an hour
-        const secret = process.env.JWT_SECRET;
-        return {
-            expiresIn,
-            token: jwt.sign(Data, secret, { expiresIn })
-        };
-    }
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield pool.connect();
-                const sql = 'SELECT * FROM employee';
+                const sql = 'SELECT * FROM EMPLOYEE';
                 const { rows } = yield client.query(sql);
-                const users = rows;
+                const EMPLOYEE = rows;
                 client.release();
-                res.status(200).send(users);
+                res.status(200).send(EMPLOYEE);
             }
             catch (error) {
                 res.status(400).send(error);
@@ -37,14 +30,20 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield pool.connect();
-                const sql = `INSERT INTO employee (last_name, first_name, title, email, password) VALUES('${req.body.last_name}','${req.body.first_name}','${req.body.title}','${req.body.email}','${req.body.password}')`;
+                const salt = yield bcryptjs.genSalt(10);
+                var password = yield bcryptjs.hash(req.body.password, salt);
+                req.body.password = password.replace('\/s', "");
+                console.log(req.body)
+                const sql = `INSERT INTO EMPLOYEE (last_name, first_name, title, email, password) VALUES('${req.body.last_name}','${req.body.first_name}','${req.body.title}','${req.body.email}','${req.body.password}')`;
                 const { rowCount } = yield client.query(sql);
                 if (rowCount == 1) {
-                    const data = this.createToken({ email: req.body.email });
+                    const expiresIn = 60 * 60; // an hour
+                    const secret = process.env.JWT_SECRET;
+                    const token = { expiresIn: expiresIn, token: jwt.sign(req.body.email, secret) };
+                    res.setHeader('authorization', token.token);
                     res
-                        .cookie('auth_token', data)
                         .status(200)
-                        .send({ rowCount: rowCount, result: rowCount == 1 ? true : false });
+                        .send({ rowCount: rowCount, result: rowCount == 1 ? true : false, token: token });
                 }
                 client.release();
             }
@@ -57,12 +56,19 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield pool.connect();
-                const sql = `SELECT password FROM employee WHERE email=${req.body.email}`;
+                const sql = `SELECT password FROM EMPLOYEE WHERE email='${req.body.email}'`;
                 const { rows } = yield client.query(sql);
-                const result = yield client.query(sql);
-                const users = rows;
+                const result = bcryptjs.compare(req.body.password, rows[0].password);
                 client.release();
-                res.status(200).send(result);
+                if (result) {
+                    const expiresIn = 60 * 60; // an hour
+                    const secret = process.env.JWT_SECRET;
+                    const token = { expiresIn: expiresIn, token: jwt.sign(req.body.email, secret) };
+                    res.setHeader('authorization', token.token);
+                    res
+                        .status(200)
+                        .send(token);
+                }
             }
             catch (error) {
                 res.status(404).send(error);
@@ -73,7 +79,7 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield pool.connect();
-                const sql = `UPDATE employee SET FIRST_NAME='${req.body.first_name}',LAST_NAME='${req.body.last_name}',TITLE='${req.body.title}' WHERE employee_id=${req.body.id}`;
+                const sql = `UPDATE EMPLOYEE SET FIRST_NAME='${req.body.first_name}',LAST_NAME='${req.body.last_name}',TITLE='${req.body.title}' WHERE EMAIL='${req.body.email}'`;
                 const { rowCount } = yield client.query(sql);
                 client.release();
                 res.status(200).send({ rowcount: rowCount, result: rowCount == 1 ? true : false });
@@ -87,7 +93,8 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const client = yield pool.connect();
-                const sql = `DELETE FROM employee WHERE employee_id=${req.params.id}`;
+                console.log(req.params.id)
+                const sql = `DELETE FROM EMPLOYEE WHERE email='${req.params.id}'`;
                 const { rowCount } = yield client.query(sql);
                 client.release();
                 res.send({ rowcount: rowCount, result: rowCount == 1 ? true : false });
